@@ -7,7 +7,7 @@
   -> `medinstrmfg.advisor` -> `medinstrmfg.governor` ->
   `medinstrmfg.phase` -> `medinstrmfg.store` -- through a scenario
   adapted from this repo's own `medinstrmfg.sim` demo driver
-  (`clojure -M:dev:run`), and renders the page from whatever that run
+  (`kbb -M:dev:run`), and renders the page from whatever that run
   actually produced.
 
   NOTHING on the page is hand-typed telemetry:
@@ -33,7 +33,7 @@
   caller; two runs from the same seed are byte-identical. The page
   therefore carries no generation timestamp either -- deliberately.
 
-  Usage: `clojure -M:dev:render-html [out-file]`
+  Usage: `kbb -M:dev:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
   (:require [kotoba.lang.text :as str]
             [jp-go-dds.skin :as skin]
@@ -429,7 +429,7 @@
      "<span class=\"badge\">phase " ph " · " (esc (:label (get phase/phases ph))) "</span> "
      "<span class=\"badge\">maintenance &amp; shipment always human-approved</span></p>\n"
      "<p class=\"muted\">Generated at build time by <code>medinstrmfg.render-html</code> "
-     "(<code>clojure -M:dev:render-html</code>) from a real run of the "
+     "(<code>kbb -M:dev:render-html</code>) from a real run of the "
      "<code>medinstrmfg.operation</code> StateGraph — advisor → governor → phase gate → store. "
      "Every figure below is actor output, not sample text. No timestamps: the page is "
      "byte-identical on every rebuild from the same seed.</p>\n"
