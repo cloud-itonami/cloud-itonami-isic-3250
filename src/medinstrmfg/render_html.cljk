@@ -35,7 +35,7 @@
 
   Usage: `kbb -M:dev:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
-  (:require [kotoba.lang.text :as str]
+  (:require [kotoba.io :as kio] [kotoba.lang.text :as str]
             [jp-go-dds.skin :as skin]
             [langgraph.graph :as g]
             [medinstrmfg.governor :as governor]
@@ -539,7 +539,7 @@
                            "relax this check.")
                       {:out out :ledger-facts (count ledger) :governor-holds 0})))
     (let [html (render result)]
-      (.mkdirs (.getParentFile (java.io.File. ^String out)))
+      (kio/mkdirs (kio/parent-file (kio/file ^String out)))
       (spit out html :encoding "UTF-8")
       (println "wrote" out
                (str "(" (count ledger) " ledger facts, "
