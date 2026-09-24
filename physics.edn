@@ -1,0 +1,43 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README: an ISIC 3250 plant precision-machines surgical and dental
+;; instruments, moulds single-use plastic devices, and sterilization-validates
+;; (autoclave / EtO, sterility-assurance testing) the finished products. The
+;; physical work around that plant: an arm loading instrument trays into the
+;; steam steriliser, the steam penetrating a wrapped instrument pack, and the
+;; purified-water loop feeding the washer-disinfectors.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-3250"
+ :cases
+ [{:id :load-tray-into-steriliser
+   :kind :manipulator
+   :procedure "loading arm lifts a wrapped instrument tray off the loading trolley and slides it onto a steriliser chamber shelf"
+   :params {:l1-m 0.55 :l2-m 0.50 :m1-kg 7.0 :m2-kg 5.0
+            :from [0.60 -0.10] :to [0.55 0.45] :duration-s 2.0 :steps 400}
+   :sweep {:param :payload-kg :values [2.0 4.0 6.0 8.0 11.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 110.0 :basis "estimate: continuous shoulder torque of a ~12 kg-payload collaborative arm class"}
+   :boundary {:lo 0.5 :hi 40.0}}
+  {:id :wrapped-pack-steam-penetration
+   :kind :thermal
+   :procedure "wrapped instrument pack heats in 134 C saturated steam; the sterilising hold starts when the pack centre reaches 133 C. Half the pack is modelled with an adiabatic (symmetry) back face, so the back face is the pack centre; the pack is treated as a conducting solid (no steam flow through it)"
+   :params {:conductivity-w-mk 0.60 :density-kg-m3 900.0 :specific-heat-j-kgk 800.0
+            :t0-c 20.0 :t-hot-c 134.0 :h-front-w-m2k 500.0 :h-back-w-m2k 0.0
+            :threshold-c 133.0 :duration-s 7200.0 :nodes 11}
+   :sweep {:param :thickness-m :values [0.010 0.020 0.030 0.040 0.060]}
+   :quantity :time-to-threshold-s
+   :limit {:max 900.0 :basis "estimate: a 15-minute equilibration allowance ahead of the 134 C hold in the validated cycle; pack properties and condensing-steam h = 500 W/m2K are estimates"}
+   :boundary {:lo 0.005 :hi 0.1}}
+  {:id :purified-water-loop
+   :kind :pipe-flow
+   :procedure "purified-water distribution loop (DN25 sanitary stainless, 60 m) circulates to the washer-disinfectors"
+   :params {:diameter-m 0.0229 :length-m 60.0 :roughness-m 1.0e-6
+            :density-kg-m3 998.0 :viscosity-pa-s 1.0e-3 :pump-efficiency 0.50 :elevation-m 0.0}
+   :sweep {:param :q-m3s :values [0.0002 0.0003 0.0004 0.0006 0.0008]}
+   :quantity :velocity-mps
+   :limit {:min 1.0 :basis "estimate: common design practice keeps purified-water loop velocity at or above ~1 m/s to limit biofilm formation"}
+   :boundary {:lo 0.0001 :hi 0.002}}]}
